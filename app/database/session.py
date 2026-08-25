@@ -28,3 +28,12 @@ AsyncSessionLocal = async_sessionmaker(
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     async with AsyncSessionLocal() as session:
         yield session
+
+import redis.asyncio as redis
+
+redis_client = redis.from_url(
+    settings.redis_url,
+    decode_responses=True,
+    socket_connect_timeout=5,
+    socket_timeout=5,
+)
