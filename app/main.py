@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request, HTTPException, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime, timezone
@@ -14,6 +15,19 @@ app = FastAPI(
     title="URLiy",
     description="URL shortener",
     version="0.1.0",
+)
+
+origins = [
+    "http://localhost:5173",
+    "https://urliy.vercel.app",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
