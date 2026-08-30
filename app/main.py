@@ -1,16 +1,13 @@
-from fastapi import FastAPI
-from fastapi import HTTPException
+from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.responses import RedirectResponse
+from sqlalchemy.ext.asyncio import AsyncSession
+from datetime import datetime, timezone
+import json
 
 from app.database.session import get_db, redis_client
-from app.services.url_service import get_url_by_short_code
+from app.services.url_service import get_url_by_short_code, record_url_click
 from app.api.url_routes import router as url_router
 from app.api.auth_routes import router as auth_router
-
-from datetime import datetime, timezone
-
-from fastapi import Depends
-from sqlalchemy.ext.asyncio import AsyncSession
 
 
 app = FastAPI(
@@ -23,6 +20,7 @@ app = FastAPI(
 app.include_router(url_router)
 app.include_router(auth_router)
 
+
 @app.get("/health")
 async def health_check():
     return {
@@ -30,18 +28,30 @@ async def health_check():
         "service": "URLiy",
     }
 
+
 @app.get("/{short_code}")
 async def redirect_short_url(
     short_code: str,
+    request: Request,
     db: AsyncSession = Depends(get_db),
 ):
     cache_key = f"url:{short_code}"
 
-    cached_url = await redis_client.get(cache_key)
+    cached_data = await redis_client.get(cache_key)
+    # REDIS CACHE HIT
+    if cached_data:
+        cached_data = json.loads(cached_data)
 
-    if cached_url:
+        await record_url_click(
+            db=db,
+            url_id=cached_data["url_id"],
+            ip_address=request.client.host if request.client else None,
+            user_agent=request.headers.get("user-agent"),
+            referrer=request.headers.get("referer"),
+        )
+
         return RedirectResponse(
-            url=cached_url,
+            url=cached_data["original_url"],
             status_code=302,
         )
 
@@ -53,20 +63,35 @@ async def redirect_short_url(
             detail="Short URL not found",
         )
 
+#EXPIRATION CHECK
     if url.expires_at and url.expires_at <= datetime.now(timezone.utc):
         raise HTTPException(
             status_code=410,
             detail="Short URL has expired",
         )
 
-    await redis_client.set(
-        cache_key,
-        url.original_url,
-        ex=345600,  # 4 days
+#CLICK TRACKING
+    await record_url_click(
+        db=db,
+        url_id=url.id,
+        ip_address=request.client.host if request.client else None,
+        user_agent=request.headers.get("user-agent"),
+        referrer=request.headers.get("referer"),
     )
 
-    response = RedirectResponse(
+#SAVE URL TO REDIS CACHE
+    cache_data = json.dumps({
+        "url_id": str(url.id),
+        "original_url": url.original_url,
+    })
+
+    await redis_client.set(
+        cache_key,
+        cache_data,
+        ex=345600,  #4 days
+    )
+
+    return RedirectResponse(
         url=url.original_url,
         status_code=302,
     )
-    return response
