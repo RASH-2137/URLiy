@@ -429,7 +429,14 @@ The goal wasn't simply to generate shorter URLs, but to build a small production
 
 ---
 
-## 👨‍💻 Author
+<div align="center">
 
-**Rahul Sharma**
-Built as a full-stack engineering project with React, FastAPI, PostgreSQL, Redis, Vercel, and Render.
+**👨‍💻 Rahul Sharma**
+
+Portfolio: https://rash-2137.github.io
+
+GitHub: https://github.com/RASH-2137
+
+[Report Bug](../../issues) · [Request Feature](../../issues) · [Discussions](../../discussions)
+
+</div>
