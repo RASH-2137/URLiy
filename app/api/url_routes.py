@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime, timedelta, timezone
 from app.config.settings import get_settings
@@ -9,6 +9,7 @@ from app.auth.dependencies import get_current_user
 from app.models.user import User
 from fastapi import HTTPException
 from app.database.session import redis_client
+from app.utils.rate_limit import rate_limit
 
 settings = get_settings()
 
@@ -18,10 +19,20 @@ router = APIRouter(
 )
 
 
+async def shorten_rate_limit(request: Request):
+    await rate_limit(
+        request,
+        limit=30,
+        window_seconds=60,
+        key_prefix="shorten",
+    )
+
+
 @router.post(
     "/",
     response_model=URLResponse,
     status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(shorten_rate_limit)],
 )
 async def shorten_url(
     data: URLCreate,
@@ -40,6 +51,7 @@ async def shorten_url(
         original_url=url.original_url,
         expires_at=url.expires_at,
     )
+
 
 @router.post(
     "/permanent",
@@ -66,6 +78,7 @@ async def create_permanent_url(
         expires_at=None,
     )
 
+
 @router.get(
     "/my",
     response_model=list[URLResponse],
@@ -89,6 +102,7 @@ async def get_my_urls(
         )
         for url in urls
     ]
+
 
 @router.delete(
     "/{short_code}",
@@ -118,6 +132,8 @@ async def delete_url(
     await db.commit()
 
     await redis_client.delete(f"url:{short_code}")
+
+
 @router.get(
     '/{short_code}/analytics',
     response_model=URLAnalyticsResponse,

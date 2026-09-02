@@ -50,7 +50,12 @@ async def redirect_short_url(
 ):
     cache_key = f"url:{short_code}"
 
-    cached_data = await redis_client.get(cache_key)
+    cached_data = None
+
+    try:
+        cached_data = await redis_client.get(cache_key)
+    except Exception:
+        cached_data = None
     # REDIS CACHE HIT
     if cached_data:
         cached_data = json.loads(cached_data)
@@ -98,11 +103,14 @@ async def redirect_short_url(
         "original_url": url.original_url,
     })
 
-    await redis_client.set(
-        cache_key,
-        cache_data,
-        ex=345600,  #4 days
-    )
+    try:
+        await redis_client.set(
+            cache_key,
+            cache_data,
+            ex=345600,  #4 days
+        )
+    except Exception:
+        pass
 
     return RedirectResponse(
         url=url.original_url,
