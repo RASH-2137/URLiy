@@ -5,8 +5,8 @@
 **A URL shortener built for speed, reliability, and simplicity.**
 
 [![Live App](https://img.shields.io/badge/Live_App-urliy.spacekid.xyz-000000?style=for-the-badge&logo=vercel)](https://urliy.spacekid.xyz)
-[![Backend API](https://img.shields.io/badge/Backend_API-url.spacekid.xyz-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://url.spacekid.xyz)
-[![API Docs](https://img.shields.io/badge/API_Docs-Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)](https://url.spacekid.xyz/docs)
+[![Backend API](https://img.shields.io/badge/Backend_API-urliy.onrender.com-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://urliy.onrender.com/)
+[![API Docs](https://img.shields.io/badge/API_Docs-Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)](https://urliy.onrender.com/docs)
 
 [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)]()
 [![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)]()
