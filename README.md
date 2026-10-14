@@ -44,8 +44,8 @@ The project goes beyond basic URL shortening and includes:
 | Service | URL |
 | :--- | :--- |
 | **Frontend** | [https://urliy.spacekid.xyz](https://urliy.spacekid.xyz) |
-| **Backend API** | [https://url.spacekid.xyz](https://url.spacekid.xyz) |
-| **API Documentation** | [https://url.spacekid.xyz/docs](https://url.spacekid.xyz/docs) |
+| **Backend API** | [https://urliy.onrender.com](https://urliy.onrender.com) |
+| **API Documentation** | [https://urliy.onrender.com/docs](https://urliy.onrender.com/docs) |
 
 > *The frontend is deployed on Vercel; the FastAPI backend runs on Render.*
 
