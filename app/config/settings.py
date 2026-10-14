@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     app_name: str = "URLly"
     environment: str = "development"
-    base_url: str = "https://spacekid.xyz"
+    base_url: str = "https://urliy.onrender.com"
 
     database_url: str
     redis_url: str
